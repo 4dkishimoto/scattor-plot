@@ -110,7 +110,7 @@ export const Plot = () => {
     g.attr("transform", "translate(" + 60 + "," + 60 + ")");
 
     // Add X axis
-    const x = d3.scaleLinear().domain([0, 28]).range([0, width]);
+    const x = d3.scaleLinear().domain([0, 26]).range([0, width]);
     const ax = d3
       .axisBottom(x)
       .scale(x)
@@ -151,13 +151,14 @@ export const Plot = () => {
       .attr("class", "grid grid-x")
       .attr("transform", "translate(0," + height + ")")
       .style("stroke-dasharray", "5 5")
+      .style("width", 10)
       .call(
         d3
           .axisBottom(x)
           .ticks(5)
           .tickSize(-height)
           .tickFormat((d: any) => {
-            console.log(d);
+            // console.log(d);
             if (d === 0) {
               return "";
             }
@@ -182,7 +183,46 @@ export const Plot = () => {
           })
       );
 
-    g.selectAll(".grid").selectAll("line").attr("stroke", "lightgray");
+    // g.selectAll(".grid").selectAll("line").attr("stroke", "lightgray");
+
+    // add
+    g.append("text")
+      .attr("text-anchor", "end")
+      .attr("x", width + 35)
+      .attr("y", height + 5)
+      .style("font-size", 10)
+      .text("時間");
+
+    g.append("text")
+      .attr("text-anchor", "end")
+      // .attr("transform", "rotate(-90)")
+      .attr("y", -30)
+      .attr("x", 30)
+      .style("font-size", 10)
+      .text("価格分布(¥)");
+
+    // triangle
+    g.append("polygon")
+      .attr("points", "0,0 0,12 -8,12")
+      .attr("class", "bars")
+      .attr("x", 19) // 親要素からの相対位置
+      .attr("y", 0) // 親要素からの相対位置
+      .attr("width", 8) // 従来通り
+      .attr("height", 12) // 従来通り
+      .attr("fill", "#606b67");
+
+    g.append("polygon")
+      .attr(
+        "points",
+        `${width - 12},${height - 8} ${width},${height} ${width - 12},${height}`
+      )
+      // .attr("transform", "rotate(-90deg)")
+      .attr("class", "bars")
+      .attr("x", 19) // 親要素からの相対位置
+      .attr("y", 0) // 親要素からの相対位置
+      .attr("width", 8) // 従来通り
+      .attr("height", 12) // 従来通り
+      .attr("fill", "#606b67");
 
     // Add dots`
     const dots = g
