@@ -85,24 +85,10 @@ export const Plot = () => {
     },
   ];
 
-  const Tooltip = styled.div<{isShow?: boolean; pos: {x: string; y: string}}>`
-    padding: 16px;
-    position: absolute;
-    transition: opacity 0.5s ease;
-    opacity: 0;
-    border-radius: 4px;
-    box-shadow: 0px 2px 16px 0 rgba(43, 47, 55, 0.16);
-    background-color: white;
-    visibility: ${(props) => (props.isShow ? "visible" : "hidden")};
-    opacity: ${(props) => (props.isShow ? 1 : 0)};
-    top: ${(props) => props.pos.y};
-    left: ${(props) => props.pos.x};
-  `;
-
   useEffect(() => {
     // set the dimensions and margins of the graph
     const margin = {top: 10, right: 30, bottom: 30, left: 60},
-      width = 460 - margin.left - margin.right,
+      width = 800 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
 
     const g = d3.select(".graph");
@@ -110,7 +96,7 @@ export const Plot = () => {
     g.attr("transform", "translate(" + 60 + "," + 60 + ")");
 
     // Add X axis
-    const x = d3.scaleLinear().domain([0, 26]).range([0, width]);
+    const x = d3.scaleLinear().domain([10, 26]).range([0, width]);
     const ax = d3
       .axisBottom(x)
       .scale(x)
@@ -138,7 +124,7 @@ export const Plot = () => {
       .ticks(4)
       .tickFormat((d: any) => {
         console.log(d);
-        if (d === 250000) {
+        if (d === 0 || d === 250000) {
           return "";
         }
         return d;
@@ -152,14 +138,16 @@ export const Plot = () => {
       .attr("transform", "translate(0," + height + ")")
       .style("stroke-dasharray", "5 5")
       .style("width", 10)
+
       .call(
         d3
+
           .axisBottom(x)
-          .ticks(5)
+          .ticks(10)
           .tickSize(-height)
           .tickFormat((d: any) => {
             // console.log(d);
-            if (d === 0) {
+            if (d === 10 || d === 26) {
               return "";
             }
             return d;
@@ -169,6 +157,7 @@ export const Plot = () => {
     g.insert("g", "#scatterplot")
       .attr("class", "grid grid-y")
       .style("stroke-dasharray", "5 5")
+      .style("storoke", "lightgray")
       .call(
         d3
           .axisLeft(y)
@@ -176,13 +165,37 @@ export const Plot = () => {
           .tickSize(-width)
           .tickFormat((d: any) => {
             console.log(d);
-            if (d === 0) {
+            if (d === 0 || d === 250000) {
               return "";
             }
             return d;
           })
       );
 
+    d3.selectAll("g .grid-x .tick line")
+      .style("opacity", 0.2)
+      .call((d: any) => {
+        console.log(d);
+        return d;
+      });
+
+    d3.selectAll("g .grid-y .tick line")
+      .style("opacity", 0.2)
+      .call((d: any) => {
+        console.log(d);
+        return d;
+      });
+
+    d3.selectAll("g .grid-x .tick text").attr("dy", 20);
+
+    d3.selectAll("g .grid-y .tick text").attr("dx", -20);
+
+    // d3.selectAll("g.tick line")
+    //   .style("opacity", 0.2)
+    //   .call((d: any) => {
+    //     console.log(d);
+    //     return d;
+    //   });
     // g.selectAll(".grid").selectAll("line").attr("stroke", "lightgray");
 
     // add
@@ -317,23 +330,54 @@ export const Plot = () => {
         alert(`clicked  x: ${d.startTime} y: ${d.price}`);
       });
   };
+
+  const Tooltip = styled.div<{isShow?: boolean; pos: {x: string; y: string}}>`
+    padding: 16px;
+    position: absolute;
+    transition: opacity 0.5s ease;
+    /* opacity: 0; */
+    border-radius: 4px;
+    box-shadow: 0px 2px 16px 0 rgba(43, 47, 55, 0.16);
+    background-color: white;
+    visibility: ${(props) => (props.isShow ? "visible" : "hidden")};
+    opacity: ${(props) => (props.isShow ? 1 : 0)};
+    top: ${(props) => props.pos.y};
+    left: ${(props) => props.pos.x};
+  `;
+
+  const Title = styled.div`
+    font-size: 13px;
+    font-weight: bold;
+    font-stretch: normal;
+    text-align: left;
+  `;
+
+  const InnerContent = styled.div`
+    font-size: 11px;
+    font-weight: normal;
+    color: #1d2028;
+  `;
+
   console.log(pos);
   return (
     <div>
       <Tooltip id="tooltip" className="tooltip" isShow={pos.x !== ""} pos={pos}>
-        <div>¥{currentHoverData.price}</div>
-        <div>
+        <Title>
+          ¥{currentHoverData.price.toLocaleString()}(
+          {currentHoverData.flightTime})
+        </Title>
+        <InnerContent>
           <span>{currentHoverData.flightNumber}</span>
           <span>{currentHoverData.time}</span>
           <span>{currentHoverData.date}</span>
           <span>{currentHoverData.flightTime}</span>
-        </div>
-        <div>
+        </InnerContent>
+        <InnerContent>
           <span>{currentHoverData.flightNumber}</span>
           <span>{currentHoverData.time}</span>
           <span>{currentHoverData.date}</span>
           <span>{currentHoverData.flightTime}</span>
-        </div>
+        </InnerContent>
       </Tooltip>
       <button onClick={addReservation}>追加</button>
       <svg height={500} width={1000}>
